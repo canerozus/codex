@@ -1,5 +1,4 @@
 use crate::mcp_tool_call::handle_mcp_tool_call;
-use crate::protocol::SandboxPolicy;
 use crate::tools::sandboxing::Approvable;
 use crate::tools::sandboxing::ApprovalCtx;
 use crate::tools::sandboxing::ProvidesSandboxRetryData;
@@ -11,7 +10,6 @@ use crate::tools::sandboxing::ToolError;
 use crate::tools::sandboxing::ToolRuntime;
 use crate::tools::sandboxing::with_cached_approval;
 use codex_protocol::models::ResponseInputItem;
-use codex_protocol::protocol::AskForApproval;
 use codex_protocol::protocol::ReviewDecision;
 use futures::future::BoxFuture;
 use serde::Serialize;
@@ -111,18 +109,6 @@ impl Approvable<McpToolCallRequest> for McpRuntime {
             })
             .await
         })
-    }
-
-    fn wants_initial_approval(
-        &self,
-        _req: &McpToolCallRequest,
-        policy: AskForApproval,
-        _sandbox_policy: &SandboxPolicy,
-    ) -> bool {
-        matches!(
-            policy,
-            AskForApproval::OnRequest | AskForApproval::UnlessTrusted
-        )
     }
 }
 
