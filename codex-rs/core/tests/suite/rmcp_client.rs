@@ -218,7 +218,6 @@ async fn mcp_calls_require_approval_when_requested() -> anyhow::Result<()> {
 
     let fixture = test_codex()
         .with_config(move |config| {
-            config.features.enable(Feature::RmcpClient);
             config.mcp_servers.insert(
                 server_name.to_string(),
                 McpServerConfig {

@@ -1,7 +1,6 @@
 use crate::mcp_tool_call::handle_mcp_tool_call;
 use crate::tools::sandboxing::Approvable;
 use crate::tools::sandboxing::ApprovalCtx;
-use crate::tools::sandboxing::ProvidesSandboxRetryData;
 use crate::tools::sandboxing::SandboxAttempt;
 use crate::tools::sandboxing::Sandboxable;
 use crate::tools::sandboxing::SandboxablePreference;
@@ -23,12 +22,6 @@ pub struct McpToolCallRequest {
     pub tool: String,
     pub raw_arguments: String,
     pub cwd: PathBuf,
-}
-
-impl ProvidesSandboxRetryData for McpToolCallRequest {
-    fn sandbox_retry_data(&self) -> Option<crate::tools::sandboxing::SandboxRetryData> {
-        None
-    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize)]
@@ -92,18 +85,16 @@ impl Approvable<McpToolCallRequest> for McpRuntime {
         let call_id = ctx.call_id.to_string();
         let cwd = req.cwd.clone();
         let reason = ctx.retry_reason.clone();
-        let risk = ctx.risk.clone();
 
         Box::pin(async move {
             with_cached_approval(&session.services, key, move || {
                 let command = command.clone();
                 let call_id = call_id.clone();
                 let reason = reason.clone();
-                let risk = risk.clone();
                 let cwd = cwd.clone();
                 async move {
                     session
-                        .request_command_approval(turn, call_id, command, cwd, reason, risk)
+                        .request_command_approval(turn, call_id, command, cwd, reason, None)
                         .await
                 }
             })
